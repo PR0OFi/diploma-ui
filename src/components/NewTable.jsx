@@ -10,17 +10,15 @@ import {
     TableBody,
     Table,
     Box,
-    IconButton,
     Button,
     TextField,
     Select,
     MenuItem,
 } from '@material-ui/core';
 import API from "../services/API";
-import DeleteIcon from '@material-ui/icons/Delete';
-import EditIcon from '@material-ui/icons/Edit';
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
+import UserItem from "./UserItem";
 
 const useStyles = makeStyles((theme) => ({
     table: {
@@ -61,7 +59,7 @@ const NewTable = () => {
             })
     }, []);
 
-    const formHandler = ({ target }) => {
+    const formHandler = ({target}) => {
         setForm((prevState) => ({
             ...prevState,
             [target.name]: target.value,
@@ -69,11 +67,21 @@ const NewTable = () => {
     };
 
     const saveHandler = () => {
-        API.post('/create', { ...form, age: Number(form.age) })
+        API.post('/create', {...form, age: Number(form.age)})
             .then(() => {
                 setIsCreate(false)
                 getUsers();
             })
+    }
+
+    const deleteUser = (userID) => {
+        API.post('/delete', {userID})
+            .then(() => getUsers())
+    }
+
+    const updateUser = (editForm) => {
+        API.post('/update', {...editForm, age: Number(editForm.age)})
+            .then(() => getUsers())
     }
 
     return (
@@ -145,8 +153,10 @@ const NewTable = () => {
                                                 />
                                             </TableCell>
                                             <TableCell align="right">
-                                                <FormControl variant="outlined" size="small" className={classes.formControl}>
-                                                    <InputLabel id="demo-simple-select-outlined-label">Gender</InputLabel>
+                                                <FormControl variant="outlined" size="small"
+                                                             className={classes.formControl}>
+                                                    <InputLabel
+                                                        id="demo-simple-select-outlined-label">Gender</InputLabel>
                                                     <Select
                                                         value={form.sex}
                                                         onChange={formHandler}
@@ -166,44 +176,27 @@ const NewTable = () => {
                                             </TableCell>
                                             <TableCell align="right">
                                                 <Box mr={1}>
-                                                    <Button variant="contained" color="primary" size="small" onClick={saveHandler}>
+                                                    <Button variant="contained" color="primary" size="small"
+                                                            onClick={saveHandler}>
                                                         Save
                                                     </Button>
                                                 </Box>
-                                                <Button variant="contained" color="secondary" size="small" onClick={() => setIsCreate(false)}>
+                                                <Button variant="contained" color="secondary" size="small"
+                                                        onClick={() => setIsCreate(false)}>
                                                     Cancel
                                                 </Button>
                                             </TableCell>
                                         </TableRow>
                                     )
                                 }
-                                {
-                                    users.map((user, i) => (
-                                        <TableRow key={i}>
-                                            <TableCell component="th" scope="row">
-                                                {user.name}
-                                            </TableCell>
-                                            <TableCell align="right">{user.lastName}</TableCell>
-                                            <TableCell align="right">{user.age}</TableCell>
-                                            <TableCell align="right">{user.phone}</TableCell>
-                                            <TableCell align="right">{user.sex}</TableCell>
-                                            <TableCell align="right">
-                                                <div className="table-action">
-                                                    <Box m={1}>
-                                                        <IconButton aria-label="edit" size="small">
-                                                            <EditIcon fontSize="inherit"/>
-                                                        </IconButton>
-                                                    </Box>
-                                                    <Box m={1}>
-                                                        <IconButton aria-label="delete" size="small">
-                                                            <DeleteIcon fontSize="inherit"/>
-                                                        </IconButton>
-                                                    </Box>
-                                                </div>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))
-                                }
+                                {users.map((user) => (
+                                    <UserItem
+                                        user={user}
+                                        key={user.id}
+                                        deleteUser={deleteUser}
+                                        classes={classes}
+                                        updateUser={updateUser}/>
+                                ))}
                             </TableBody>
                         </Table>
                     </TableContainer>
