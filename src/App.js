@@ -1,13 +1,7 @@
 import React from 'react';
-import NewTable from "./components/NewTable";
+import {UserManagement} from "./modules/user";
 
-function App() {
-    return (
-        <>
-            <NewTable/>
-        </>
-    );
-}
+const App = () => <UserManagement/>;
 
 export default App;
 
